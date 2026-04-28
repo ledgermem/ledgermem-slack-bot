@@ -11,6 +11,18 @@ import {
 
 const { App } = bolt;
 
+// Slack's chat.* APIs reject messages whose `text` exceeds 3000 chars
+// (slack/web-api: invalid_arguments / msg_too_long). Recall payloads with a
+// few large memories blow past that, so clamp before responding.
+const SLACK_TEXT_LIMIT = 3000;
+const TRUNCATION_SUFFIX = "\n…(truncated)";
+
+function clampForSlack(text: string): string {
+  if (text.length <= SLACK_TEXT_LIMIT) return text;
+  const room = SLACK_TEXT_LIMIT - TRUNCATION_SUFFIX.length;
+  return `${text.slice(0, room)}${TRUNCATION_SUFFIX}`;
+}
+
 // Slack retries any non-2xx delivery up to 3 times. We dedup by command/event
 // id so a write-side handler can't double-ingest on a retry.
 const RETRY_NUM_HEADER = "x-slack-retry-num";
@@ -64,7 +76,7 @@ async function main(): Promise<void> {
         optedInChannels: cfg.optInChannels,
         memory,
       });
-      await respond({ response_type: result.responseType, text: result.text });
+      await respond({ response_type: result.responseType, text: clampForSlack(result.text) });
     } catch (err) {
       console.error("/remember failed:", err);
       await respond({ response_type: "ephemeral", text: "Sorry, something went wrong." });
@@ -83,7 +95,7 @@ async function main(): Promise<void> {
         optedInChannels: cfg.optInChannels,
         memory,
       });
-      await respond({ response_type: result.responseType, text: result.text });
+      await respond({ response_type: result.responseType, text: clampForSlack(result.text) });
     } catch (err) {
       console.error("/recall failed:", err);
       await respond({ response_type: "ephemeral", text: "Sorry, something went wrong." });
@@ -102,7 +114,7 @@ async function main(): Promise<void> {
         optedInChannels: cfg.optInChannels,
         memory,
       });
-      await respond({ response_type: result.responseType, text: result.text });
+      await respond({ response_type: result.responseType, text: clampForSlack(result.text) });
     } catch (err) {
       console.error("/forget failed:", err);
       await respond({ response_type: "ephemeral", text: "Sorry, something went wrong." });
@@ -127,7 +139,7 @@ async function main(): Promise<void> {
       await client.chat.postEphemeral({
         channel: shortcut.channel.id,
         user: shortcut.user.id,
-        text: reply,
+        text: clampForSlack(reply),
       });
     } catch (err) {
       console.error("save_to_memory failed:", err);
@@ -151,6 +163,24 @@ async function main(): Promise<void> {
   console.log(
     `LedgerMem Slack bot running (${cfg.socketMode ? "socket" : "http"} mode, port ${cfg.port}).`,
   );
+
+  // Graceful shutdown — app.stop() drains the socket-mode receiver and the
+  // HTTP server so SIGTERM doesn't drop in-flight handlers mid-request.
+  let shuttingDown = false;
+  const shutdown = async (signal: string): Promise<void> => {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    // eslint-disable-next-line no-console
+    console.log(`Received ${signal}, stopping Slack app…`);
+    try {
+      await app.stop();
+    } catch (err) {
+      console.error("app.stop failed:", err);
+    }
+    process.exit(0);
+  };
+  process.once("SIGINT", () => void shutdown("SIGINT"));
+  process.once("SIGTERM", () => void shutdown("SIGTERM"));
 }
 
 main().catch((err) => {
