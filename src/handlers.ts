@@ -54,6 +54,16 @@ export async function handleRecall(ctx: CommandContext): Promise<CommandResult> 
   if (!query) {
     return { responseType: "ephemeral", text: "Usage: `/recall <query>`" };
   }
+  // Recall is read-only but still hits workspace memory — the opt-in list is
+  // also our authorization boundary, so reject from non-opted channels just
+  // like remember/forget rather than leaking content into a private channel
+  // the workspace admin hasn't approved.
+  if (!isChannelOptedIn(ctx.channelId, ctx.optedInChannels)) {
+    return {
+      responseType: "ephemeral",
+      text: "This channel is not opted in to LedgerMem. Ask an admin to add it.",
+    };
+  }
   const hits = (await ctx.memory.search(query, { limit: TOP_K })) as SearchHit[];
   if (!hits || hits.length === 0) {
     return {
