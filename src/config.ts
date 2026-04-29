@@ -4,8 +4,8 @@ export interface BotConfig {
   slackBotToken: string;
   slackAppToken: string;
   slackSigningSecret: string;
-  ledgermemApiKey: string;
-  ledgermemWorkspaceId: string;
+  getmnemoApiKey: string;
+  getmnemoWorkspaceId: string;
   socketMode: boolean;
   port: number;
   optInChannels: Set<string>;
@@ -14,8 +14,8 @@ export interface BotConfig {
 const REQUIRED = [
   "SLACK_BOT_TOKEN",
   "SLACK_SIGNING_SECRET",
-  "LEDGERMEM_API_KEY",
-  "LEDGERMEM_WORKSPACE_ID",
+  "GETMNEMO_API_KEY",
+  "GETMNEMO_WORKSPACE_ID",
 ] as const;
 
 function loadOptInChannels(): Set<string> {
@@ -51,8 +51,8 @@ export function loadConfig(): BotConfig {
     slackBotToken: process.env.SLACK_BOT_TOKEN as string,
     slackAppToken: process.env.SLACK_APP_TOKEN ?? "",
     slackSigningSecret: process.env.SLACK_SIGNING_SECRET as string,
-    ledgermemApiKey: process.env.LEDGERMEM_API_KEY as string,
-    ledgermemWorkspaceId: process.env.LEDGERMEM_WORKSPACE_ID as string,
+    getmnemoApiKey: process.env.GETMNEMO_API_KEY as string,
+    getmnemoWorkspaceId: process.env.GETMNEMO_WORKSPACE_ID as string,
     socketMode,
     port: Number(process.env.PORT ?? 3000),
     optInChannels: loadOptInChannels(),

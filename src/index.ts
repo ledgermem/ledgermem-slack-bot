@@ -1,6 +1,6 @@
 import "dotenv/config";
 import bolt from "@slack/bolt";
-import { LedgerMem } from "@ledgermem/memory";
+import { Mnemo } from "@getmnemo/memory";
 import { loadConfig } from "./config.js";
 import {
   handleRemember,
@@ -35,9 +35,9 @@ function isSlackRetry(headers: Record<string, string | string[] | undefined> | u
 
 async function main(): Promise<void> {
   const cfg = loadConfig();
-  const memory = new LedgerMem({
-    apiKey: cfg.ledgermemApiKey,
-    workspaceId: cfg.ledgermemWorkspaceId,
+  const memory = new Mnemo({
+    apiKey: cfg.getmnemoApiKey,
+    workspaceId: cfg.getmnemoWorkspaceId,
   });
 
   const app = new App({
@@ -161,7 +161,7 @@ async function main(): Promise<void> {
   await app.start();
   // eslint-disable-next-line no-console
   console.log(
-    `LedgerMem Slack bot running (${cfg.socketMode ? "socket" : "http"} mode, port ${cfg.port}).`,
+    `Mnemo Slack bot running (${cfg.socketMode ? "socket" : "http"} mode, port ${cfg.port}).`,
   );
 
   // Graceful shutdown — app.stop() drains the socket-mode receiver and the

@@ -1,9 +1,9 @@
-import type { LedgerMem } from "@ledgermem/memory";
+import type { Mnemo } from "@getmnemo/memory";
 import { isChannelOptedIn } from "./config.js";
 
 export interface MemoryClient {
-  search: LedgerMem["search"];
-  add: LedgerMem["add"];
+  search: Mnemo["search"];
+  add: Mnemo["add"];
   delete?: (id: string) => Promise<void>;
 }
 
@@ -36,7 +36,7 @@ export async function handleRemember(ctx: CommandContext): Promise<CommandResult
   if (!isChannelOptedIn(ctx.channelId, ctx.optedInChannels)) {
     return {
       responseType: "ephemeral",
-      text: "This channel is not opted in to LedgerMem. Ask an admin to add it.",
+      text: "This channel is not opted in to Mnemo. Ask an admin to add it.",
     };
   }
   await ctx.memory.add(content, {
@@ -61,7 +61,7 @@ export async function handleRecall(ctx: CommandContext): Promise<CommandResult> 
   if (!isChannelOptedIn(ctx.channelId, ctx.optedInChannels)) {
     return {
       responseType: "ephemeral",
-      text: "This channel is not opted in to LedgerMem. Ask an admin to add it.",
+      text: "This channel is not opted in to Mnemo. Ask an admin to add it.",
     };
   }
   const hits = (await ctx.memory.search(query, { limit: TOP_K })) as SearchHit[];
@@ -89,7 +89,7 @@ export async function handleForget(ctx: CommandContext): Promise<CommandResult> 
   if (typeof ctx.memory.delete !== "function") {
     return {
       responseType: "ephemeral",
-      text: "Delete is not supported by this LedgerMem client version.",
+      text: "Delete is not supported by this Mnemo client version.",
     };
   }
   await ctx.memory.delete(id);
@@ -110,7 +110,7 @@ export async function handleSaveShortcut(ctx: ShortcutContext): Promise<string> 
     return "Cannot save empty message.";
   }
   if (!isChannelOptedIn(ctx.channelId, ctx.optedInChannels)) {
-    return "This channel is not opted in to LedgerMem.";
+    return "This channel is not opted in to Mnemo.";
   }
   await ctx.memory.add(ctx.messageText, {
     metadata: {

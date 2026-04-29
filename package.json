@@ -1,7 +1,7 @@
 {
-  "name": "@ledgermem/slack-bot",
+  "name": "@getmnemo/slack-bot",
   "version": "0.1.0",
-  "description": "LedgerMem Slack bot — slash commands and message shortcuts to capture, recall, and forget memories.",
+  "description": "Mnemo Slack bot — slash commands and message shortcuts to capture, recall, and forget memories.",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
@@ -15,7 +15,7 @@
     "node": ">=22"
   },
   "dependencies": {
-    "@ledgermem/memory": "^0.1.0",
+    "@getmnemo/memory": "^0.1.0",
     "@slack/bolt": "^3.21.4",
     "dotenv": "^16.4.5"
   },
