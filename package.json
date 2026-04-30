@@ -1,5 +1,5 @@
 {
-  "name": "@getmnemo/slack-bot",
+  "name": "@mnemo/slack-bot",
   "version": "0.1.0",
   "description": "Mnemo Slack bot — slash commands and message shortcuts to capture, recall, and forget memories.",
   "type": "module",
@@ -15,7 +15,7 @@
     "node": ">=22"
   },
   "dependencies": {
-    "@getmnemo/memory": "^0.1.0",
+    "@mnemo/memory": "^0.1.0",
     "@slack/bolt": "^3.21.4",
     "dotenv": "^16.4.5"
   },

@@ -1,4 +1,4 @@
-import type { Mnemo } from "@getmnemo/memory";
+import type { Mnemo } from "@mnemo/memory";
 import { isChannelOptedIn } from "./config.js";
 
 export interface MemoryClient {

@@ -1,6 +1,6 @@
 import "dotenv/config";
 import bolt from "@slack/bolt";
-import { Mnemo } from "@getmnemo/memory";
+import { Mnemo } from "@mnemo/memory";
 import { loadConfig } from "./config.js";
 import {
   handleRemember,
